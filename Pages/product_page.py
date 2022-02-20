@@ -8,8 +8,6 @@ class ProductPage(BasePage):
         item_name = self.get_item_name()
         self.browser.find_element(*ProductPageLocators.ADD_TO_CART).click()
         self.solve_quiz_and_get_code()
-        self.check_success_alert()
-        self.check_basket_price()
 
     def get_item_name(self):
         return str(self.browser.find_element(*ProductPageLocators.ITEM_NAME).text)
@@ -27,3 +25,12 @@ class ProductPage(BasePage):
         price = self.get_price()
         basket_price = str(self.browser.find_element(*ProductPageLocators.BASKET_PRICE).text)
         assert basket_price == price, "Basket price differ from item price"
+
+    def no_success_alert_present(self):
+        assert not self.is_element_present(*ProductPageLocators.SUCCESS_ALERT), \
+            "Success message is presented"
+
+    def success_alert_disappeared(self):
+        assert not self.is_disappeared(*ProductPageLocators.SUCCESS_ALERT), \
+            "Success message is presented"
+
