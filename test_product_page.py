@@ -2,24 +2,15 @@ import pytest
 
 from .Pages.product_page import ProductPage
 from .Pages.basket_page import BasketPage
-
+from .Pages.login_page import LoginPage
 
 main_link = "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/"
 
 
-@pytest.mark.parametrize('link', ["http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer0",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer1",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer2",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer3",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer4",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer5",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer6",
+@pytest.mark.parametrize('link', ["http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/",
                                   pytest.param(
                                       "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer7",
-                                      marks=pytest.mark.xfail),
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer9",
-                                  "http://selenium1py.pythonanywhere.com/catalogue/coders-at-work_207/?promo=offer8",
-                                  ])
+                                      marks=pytest.mark.xfail)])
 @pytest.mark.need_review
 def test_guest_can_add_product_to_basket(browser, link):
     page = ProductPage(browser, link)
@@ -73,3 +64,28 @@ def test_guest_cant_see_product_in_basket_opened_from_product_page(browser):
     page.go_to_cart_page()
     page.check_basket_empty()
     page.check_message_that_basket_empty()
+
+
+@pytest.mark.login_guest
+class TestUserAddToBasketFromProductPage:
+    @pytest.fixture(scope="function", autouse=True)
+    def setup(self, browser):
+        page = ProductPage(browser, main_link)
+        page.open()
+        page.go_to_login_page()
+        login_page = LoginPage(browser, browser.current_url)
+        login_page.register_new_user()
+        login_page.should_be_authorized_user()
+
+    def test_user_cant_see_success_message(self, browser):
+        page = ProductPage(browser, main_link)
+        page.open()
+        page.no_success_alert_present()
+
+    @pytest.mark.need_review
+    def test_user_can_add_product_to_basket(self, browser):
+        page = ProductPage(browser, main_link)
+        page.open()
+        page.add_to_card()
+        page.check_success_alert()
+        page.check_basket_price()

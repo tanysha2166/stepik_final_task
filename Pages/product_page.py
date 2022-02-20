@@ -7,7 +7,7 @@ class ProductPage(BasePage):
         price = self.get_price()
         item_name = self.get_item_name()
         self.browser.find_element(*ProductPageLocators.ADD_TO_CART).click()
-        self.solve_quiz_and_get_code()
+      #  self.solve_quiz_and_get_code()
 
     def get_item_name(self):
         return str(self.browser.find_element(*ProductPageLocators.ITEM_NAME).text)
